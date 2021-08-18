@@ -26,12 +26,18 @@ const useStyles = makeStyles({
       "& $deleteTodo": {
         visibility: "visible",
       },
+      "& $setDueDate": {
+        visibility: "visible",
+      },
     },
   },
   todoTextCompleted: {
     textDecoration: "line-through",
   },
   deleteTodo: {
+    visibility: "hidden",
+  },
+  setDueDate: {
     visibility: "hidden",
   },
 });
@@ -139,13 +145,21 @@ function Todos() {
                     {text}
                   </Typography>
                 </Box>
-                <Button
-                  className={classes.deleteTodo}
-                  startIcon={<Icon>delete</Icon>}
-                  onClick={() => deleteTodo(id)}
-                >
-                  Delete
-                </Button>
+                <Box>
+                  <Button
+                    className={classes.setDueDate}
+                    startIcon={<Icon>today</Icon>}
+                  >
+                    Set Due Date
+                  </Button>
+                  <Button
+                    className={classes.deleteTodo}
+                    startIcon={<Icon>delete</Icon>}
+                    onClick={() => deleteTodo(id)}
+                  >
+                    Delete
+                  </Button>
+                </Box>
               </Box>
             ))}
           </Box>
