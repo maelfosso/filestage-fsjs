@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
-import { makeStyles } from "@material-ui/core/styles";
+// import { makeStyles } from "@material-ui/core/styles";
+import { makeStyles } from "@material-ui/styles";
 import {
   Container,
   Typography,
@@ -10,6 +11,10 @@ import {
   TextField,
   Checkbox,
 } from "@material-ui/core";
+// import AdapterDateFns from '@material-ui/lab/DateAdapter';
+import DateAdapter from '@material-ui/lab/AdapterMoment';
+import LocalizationProvider from '@material-ui/lab/LocalizationProvider';
+import DesktopDatePicker from '@material-ui/lab/DatePicker';
 
 const useStyles = makeStyles({
   addTodoContainer: { padding: 10 },
@@ -46,6 +51,7 @@ function Todos() {
   const classes = useStyles();
   const [todos, setTodos] = useState([]);
   const [newTodoText, setNewTodoText] = useState("");
+  const [dueDate, setDueDate] = useState(new Date());
 
   useEffect(() => {
     fetch("http://localhost:3001/")
@@ -94,6 +100,28 @@ function Todos() {
     }).then(() => setTodos(todos.filter((todo) => todo.id !== id)));
   }
 
+  function setDueDateTodo(id, dueDate) {
+    console.log(id, dueDate);
+    fetch(`http://localhost:3001/${id}`, {
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      method: "PATCH",
+      body: JSON.stringify({
+        dueDate
+      }),
+    }).then(() => {
+      const newTodos = [...todos];
+      const modifiedTodoIndex = newTodos.findIndex((todo) => todo.id === id);
+      newTodos[modifiedTodoIndex] = {
+        ...newTodos[modifiedTodoIndex],
+        dueDate
+      };
+      setTodos(newTodos);
+    });
+  }
+
   return (
     <Container maxWidth="md">
       <Typography variant="h3" component="h1" gutterBottom>
@@ -125,7 +153,7 @@ function Todos() {
       {todos.length > 0 && (
         <Paper className={classes.todosContainer}>
           <Box display="flex" flexDirection="column" alignItems="stretch">
-            {todos.map(({ id, text, completed }) => (
+            {todos.map(({ id, text, completed, dueDate }) => (
               <Box
                 key={id}
                 display="flex"
@@ -145,21 +173,44 @@ function Todos() {
                     {text}
                   </Typography>
                 </Box>
-                <Box>
+                <LocalizationProvider dateAdapter={DateAdapter}>
+                  <DesktopDatePicker
+                    label={text}
+                    value={dueDate}
+                    onChange={(newValue) => {
+                      setDueDateTodo(id, newValue);
+                    }}
+                    renderInput={({ inputProps, InputProps }) => {
+                      if (completed) {
+                        return null;
+                      }
+
+                      return (
+                        <Box  sx={{ display: 'flex', alignItems: 'center' }}>
+                          <span> { inputProps.value } </span>
+                          <span className={classes.deleteTodo}> {InputProps?.endAdornment} </span>
+                        </Box>
+                      );
+                    }}
+                  />
+                </LocalizationProvider>
+                <Button
+                  className={classes.deleteTodo}
+                  startIcon={<Icon>delete</Icon>}
+                  onClick={() => deleteTodo(id)}
+                >
+                  Delete
+                </Button>
+                {/* <Box>
                   <Button
                     className={classes.setDueDate}
                     startIcon={<Icon>today</Icon>}
+                    onClick={() => setDueDateTodo(id)}
                   >
                     Set Due Date
                   </Button>
-                  <Button
-                    className={classes.deleteTodo}
-                    startIcon={<Icon>delete</Icon>}
-                    onClick={() => deleteTodo(id)}
-                  >
-                    Delete
-                  </Button>
-                </Box>
+                  
+                </Box> */}
               </Box>
             ))}
           </Box>
