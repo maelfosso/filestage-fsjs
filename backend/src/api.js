@@ -42,7 +42,7 @@ app.post('/', async (req, res) => {
     return;
   }
 
-  const todo = { id: generateId(), text, completed: false };
+  const todo = { id: generateId(), text, completed: false, dueDate: null };
   await database.client.db('todos').collection('todos').insertOne(todo);
   res.status(201);
   res.json(todo);
