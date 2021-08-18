@@ -180,18 +180,12 @@ function Todos() {
                     onChange={(newValue) => {
                       setDueDateTodo(id, newValue);
                     }}
-                    renderInput={({ inputProps, InputProps }) => {
-                      if (completed) {
-                        return null;
-                      }
-
-                      return (
-                        <Box  sx={{ display: 'flex', alignItems: 'center' }}>
-                          <span> { inputProps.value } </span>
-                          <span className={classes.deleteTodo}> {InputProps?.endAdornment} </span>
-                        </Box>
-                      );
-                    }}
+                    renderInput={({ inputProps, InputProps }) => !completed && (
+                      <Box  sx={{ display: 'flex', alignItems: 'center' }}>
+                        <span> { inputProps.value } </span>
+                        <span className={classes.deleteTodo}> {InputProps?.endAdornment} </span>
+                      </Box>
+                    )}
                   />
                 </LocalizationProvider>
                 <Button
@@ -201,16 +195,6 @@ function Todos() {
                 >
                   Delete
                 </Button>
-                {/* <Box>
-                  <Button
-                    className={classes.setDueDate}
-                    startIcon={<Icon>today</Icon>}
-                    onClick={() => setDueDateTodo(id)}
-                  >
-                    Set Due Date
-                  </Button>
-                  
-                </Box> */}
               </Box>
             ))}
           </Box>
