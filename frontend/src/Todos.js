@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-// import { makeStyles } from "@material-ui/core/styles";
 import { makeStyles } from "@material-ui/styles";
 import {
   Container,
@@ -11,7 +10,6 @@ import {
   TextField,
   Checkbox,
 } from "@material-ui/core";
-// import AdapterDateFns from '@material-ui/lab/DateAdapter';
 import DateAdapter from '@material-ui/lab/AdapterMoment';
 import LocalizationProvider from '@material-ui/lab/LocalizationProvider';
 import DesktopDatePicker from '@material-ui/lab/DatePicker';
@@ -51,13 +49,13 @@ function Todos() {
   const classes = useStyles();
   const [todos, setTodos] = useState([]);
   const [newTodoText, setNewTodoText] = useState("");
-  const [dueDate, setDueDate] = useState(new Date());
+  const [filterDueDate, setFilterDueDate] = useState(null);
 
   useEffect(() => {
-    fetch("http://localhost:3001/")
+    fetch(`http://localhost:3001/?dueDate=${filterDueDate === null ? '' : filterDueDate}`)
       .then((response) => response.json())
       .then((todos) => setTodos(todos));
-  }, [setTodos]);
+  }, [setTodos, filterDueDate]);
 
   function addTodo(text) {
     fetch("http://localhost:3001/", {
@@ -150,6 +148,20 @@ function Todos() {
           </Button>
         </Box>
       </Paper>
+      <Box display="flex" flexDirection="row">
+        <LocalizationProvider dateAdapter={DateAdapter}>
+          <DesktopDatePicker
+            label="Filter by due date"
+            value={filterDueDate}
+            onChange={(newValue) => {
+              // filterByDueDate(newValue);
+              setFilterDueDate(newValue.format('YYYY-MM-DD'));
+            }}
+            renderInput={(params) => <TextField {...params} />}
+          />
+        </LocalizationProvider>
+        <Button onClick={e => setFilterDueDate(null)}>Clear</Button>
+      </Box>
       {todos.length > 0 && (
         <Paper className={classes.todosContainer}>
           <Box display="flex" flexDirection="column" alignItems="stretch">
@@ -178,7 +190,7 @@ function Todos() {
                     label={text}
                     value={dueDate}
                     onChange={(newValue) => {
-                      setDueDateTodo(id, newValue);
+                      setDueDateTodo(id, newValue.format("YYYY-MM-DD"));
                     }}
                     renderInput={({ inputProps, InputProps }) => !completed && (
                       <Box  sx={{ display: 'flex', alignItems: 'center' }}>
