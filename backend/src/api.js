@@ -27,8 +27,16 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
 app.get('/', async (req, res) => {
+  const { dueDate } = req.query;
+  console.log('Due Date : ', dueDate);
+
+  const query = {};
+  if (dueDate) {
+    query['dueDate'] = dueDate;
+  }
+
   const todos = database.client.db('todos').collection('todos');
-  const response = await todos.find({}).toArray();
+  const response = await todos.find(query).toArray();
   res.status(200);
   res.json(response);
 });
